@@ -64,6 +64,7 @@ edit newff
 %% III. MATLAB内存优化配置
 feature memstats
 % 
+
 %% IV. 向量化编程
 %%
 % 1. 及时清除不用的变量
@@ -92,7 +93,7 @@ end
 time = toc;
 disp(['预分配内存下动态赋值长为',num2str(n),'的数组时间是:',num2str(time),'秒！'])
 
-%%c
+%%
 % 3. 选择恰当的数据类型
 clear all
 clc
