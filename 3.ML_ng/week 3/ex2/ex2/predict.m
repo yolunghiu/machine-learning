@@ -15,10 +15,13 @@ p = zeros(m, 1);
 %               You should set p to a vector of 0's and 1's
 %
 
+p = sigmoid(X*theta);
 
+neg = find(p<0.5);
+pos = find(p>=0.5);
 
-
-
+p(neg) = 0;
+p(pos) = 1;
 
 
 % =========================================================================

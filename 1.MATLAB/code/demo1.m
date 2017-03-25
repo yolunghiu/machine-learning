@@ -34,9 +34,11 @@ doc num2str
 
 A = [1 2 3; 4 5 2; 3 2 7]
 B = A'
-C = A(:)
+C = A(:)		% 将A转化成一个列向量[1 2 3 4 5 2 3 2 7]'
 D = inv(A)
 A * D
+%%
+% 
 
 E = zeros(10,5,3)
 E(:,:,1) = rand(10,5)
@@ -100,6 +102,8 @@ hold on;            % 在原图像上继续画
 
 y2 = cos(2*pi*x*8)
 plot(x,y2,'r')
+
+axis([30, 100, 30, 100])	% 设置横纵坐标的量度
 
 xlabel('time')          % x轴名称
 ylabel('value')         % y轴名称

@@ -33,7 +33,8 @@ J = cost / m;
 for j=1:size(grad,1)
     sum = 0;
     for i=1:m
-        sum = sum + (sigmoid(X(i,:)*theta) - y(i)) * X(i,j);
+        sum = sum + ...
+              (sigmoid(X(i,:)*theta) - y(i)) * X(i,j);
     end
     grad(j) = sum / m;
 end
