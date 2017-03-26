@@ -83,3 +83,19 @@ modes of stimulation.
 	- The “minimal” classifier that still allowed 100% identification accuracy included votes from 4 single-item type classifiers (Black and white celebrities, Oddball color targets,Color food and Words) over 3 electrodes, located over the left middle occipital (LMOc), right middle occipital (RMOc) and middle occipital (MiOc) channels.
 	- 另一种减少时间的方法是reduce the number of trials included in the challenge
 	- The minimum number of trials needed in the challenge to produce 100% identification accuracy was 27 trials (=27 seconds) for the maximal classifier. The minimal classifier did not reach 100% accuracy unless all available trials were used.
+
+- DISCUSSION
+    - 通过ERP的方式产生的刺激与EEG比起来，更有可能产生个体差异
+    - 试验结果：
+        1. 所有单通道（single-channel）单刺激的试验结果都比pass-thought好
+        2. 但刺激的分类器中，食物和颜色刺激效果最好（86% 82%）
+				3. when multiple channels and/or stimulus types were allowed to vote in identifying a user, identification accuracy reached 100% in several configurations.
+				4. 将多种刺激的反应结合起来，将得到更高的准确率
+
+	- 作者得出的结论
+		> one reason ERP biometrics are especially accurate is that they provide the ability to tap into functionally distinct brain networks that each provide a distinct identifying information about a person. The limited past work that has explored ERP biometrics ([13], [14]) has not used this approach, of combining types of stimulation, which we suspect may have been why our approach was more accurate
+
+- 一些问题
+	- 回忆的方式准确率不高及可能原因
+	- 所有的刺激都是视觉刺激，但是其他形式的刺激没有视觉刺激及时
+	- 通过这种方式分类，六个月内准确率没有下降
