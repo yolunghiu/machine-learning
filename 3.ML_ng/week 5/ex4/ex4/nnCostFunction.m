@@ -41,8 +41,10 @@ Theta2_grad = zeros(size(Theta2));
 %         variable J. After implementing Part 1, you can verify that your
 %         cost function computation is correct by verifying the cost
 %         computed in ex4.m
+X = [ones(m,1) X];
+
 % 先计算所有的输出
-hidden = sigmoid([ones(m,1) X]*Theta1');
+hidden = sigmoid(X*Theta1');
 output = sigmoid([ones(m,1) hidden]*Theta2');
 
 % 计算出最后一层的输出之后，计算cost（没有求和以及/m操作）
@@ -77,32 +79,18 @@ J = J + regular;
 %         Hint: We recommend implementing backpropagation using a for-loop
 %               over the training examples if you are implementing it for the 
 %               first time.
-
-% 没用for循环，结果不太对
-
-a_1 = [ones(m,1), X];
-z_2 = [ones(m,1),a_1*Theta1'];
+a_1 = X;
+z_2 = a_1*Theta1';
 a_2 = sigmoid(z_2);
-z_3 = a_2*Theta2';
+z_3 = [ones(m,1) a_2]*Theta2';
 a_3 = sigmoid(z_3);
 
 delta_3 = a_3 - yk;
-delta_2 = delta_3*Theta2.*sigmoidGradient(z_2);
-% 删除delta_2中第一个元素
+delta_2 = delta_3*Theta2.*sigmoidGradient([ones(m,1) z_2]);
 delta_2 = delta_2(:,2:end);
-% delta_3 = delta_3(:,2:end);
 
 Theta1_grad = (1/m) * (Theta1_grad + delta_2'*a_1);
-Theta2_grad = (1/m) * (Theta2_grad + delta_3'*a_2);
-
-%{
-% 尝试使用for循环
-X = [ones(m,1), X];
-for t=1:m
-    a_1 = X(t, :);
-%     z_2 = 
-end
-%}
+Theta2_grad = (1/m) * (Theta2_grad + delta_3'*[ones(m,1) a_2]);
 
 % Part 3: Implement regularization with the cost function and gradients.
 %
@@ -112,7 +100,11 @@ end
 %               and Theta2_grad from Part 2.
 %
 % -------------------------------------------------------------
+gradReg1 = (lambda/m)*Theta1(:,2:end);
+gradReg2 = (lambda/m)*Theta2(:,2:end);
 
+Theta1_grad(:,2:end) = Theta1_grad(:,2:end) + gradReg1;
+Theta2_grad(:,2:end) = Theta2_grad(:,2:end) + gradReg2;
 % =========================================================================
 
 % Unroll gradients
