@@ -218,3 +218,14 @@ end
 
 % fprintf('Program paused. Press enter to continue.\n');
 % pause;
+%% 用上面选出来的lambda在测试集上测试，计算误差
+lambda = 3;
+[theta] = trainLinearReg(X_poly, y, lambda);
+[Jtest, ~] = linearRegCostFunction(X_poly_test, ytest, theta, 0);
+fprintf('error on test set is %f\n',Jtest);
+
+%% 
+
+
+
+
