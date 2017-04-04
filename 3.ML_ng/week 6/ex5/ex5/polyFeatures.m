@@ -14,7 +14,13 @@ X_poly = zeros(numel(X), p);
 %               column of X contains the values of X to the p-th power.
 %
 % 
-
+for i=1:size(X_poly,1)
+    % 取第i个样本 
+    for j=1:p
+        % 将该样本的特征增加
+        X_poly(i,j) = X(i)^j;
+    end
+end
 
 
 
