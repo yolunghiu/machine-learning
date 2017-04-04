@@ -26,3 +26,10 @@
 
 - week5
 	- Back Propergation
+   
+- week6
+    - 系统设计的一些常用方法
+    - 如何调试算法
+
+- week7
+    - SVM       
