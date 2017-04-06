@@ -25,11 +25,16 @@ centroids = zeros(K, n);
 %
 % Note: You can use a for-loop over the centroids to compute this.
 %
-
-
-
-
-
+for i=1:K
+    % 对于当前的k，找到idx中所有该类值的索引
+    currentSampleIndex = find(idx == i); 
+    % 该类所有的记录数
+    total = length(currentSampleIndex);
+    % sumVector用于存储当前类所有样本相加的和
+    sumVector = sum(X(currentSampleIndex,:));
+    
+    centroids(i,:) =  sumVector ./ total;
+end
 
 
 

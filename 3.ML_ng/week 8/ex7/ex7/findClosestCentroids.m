@@ -20,12 +20,14 @@ idx = zeros(size(X,1), 1);
 %
 % Note: You can use a for-loop over the examples to compute this.
 %
-
-
-
-
-
-
+for i=1:size(X,1)
+    sample = X(i,:);
+    distance = zeros(1,K);
+    for j=1:K
+        distance(j) = (centroids(j,:)-sample) * (centroids(j,:)-sample)';
+    end
+    [~,idx(i)] = min(distance);
+end
 
 % =============================================================
 

@@ -33,3 +33,7 @@
 
 - week7
     - SVM       
+
+- week8
+    + 聚类
+    + PCA
