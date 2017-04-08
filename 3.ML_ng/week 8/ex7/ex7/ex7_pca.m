@@ -35,8 +35,8 @@ load ('ex7data1.mat');
 plot(X(:, 1), X(:, 2), 'bo');
 axis([0.5 6.5 2 8]); axis square;
 
-fprintf('Program paused. Press enter to continue.\n');
-pause;
+% fprintf('Program paused. Press enter to continue.\n');
+% pause;
 
 
 %% =============== Part 2: Principal Component Analysis ===============
@@ -64,8 +64,8 @@ fprintf('Top eigenvector: \n');
 fprintf(' U(:,1) = %f %f \n', U(1,1), U(2,1));
 fprintf('\n(you should expect to see -0.707107 -0.707107)\n');
 
-fprintf('Program paused. Press enter to continue.\n');
-pause;
+% fprintf('Program paused. Press enter to continue.\n');
+% pause;
 
 
 %% =================== Part 3: Dimension Reduction ===================
@@ -100,8 +100,8 @@ for i = 1:size(X_norm, 1)
 end
 hold off
 
-fprintf('Program paused. Press enter to continue.\n');
-pause;
+% fprintf('Program paused. Press enter to continue.\n');
+% pause;
 
 %% =============== Part 4: Loading and Visualizing Face Data =============
 %  We start the exercise by first loading and visualizing the dataset.
