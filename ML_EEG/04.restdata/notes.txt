@@ -1,3 +1,9 @@
 参考电极的作用
 
 nonparametric Fourier Transform-based spectral analysis
+
+COH [35]
+
+GMM
+Fisher's Z transformation
+
