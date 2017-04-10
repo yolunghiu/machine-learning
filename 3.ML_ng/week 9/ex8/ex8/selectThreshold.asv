@@ -33,13 +33,12 @@ for epsilon = min(pval):stepsize:max(pval)
     % 查准率    
     precision = truePositve / (truePositve+falsePositive);
     
-    % trueNegative:分类器预测是0，真实结果是1     
-    trueNegative = sum((predictions==0) & (yval==1));
-    % 查全率     
-    recall = truePositve / (truePositve+trueNegative);
+    
 
-    % F1 score     
-    F1 = 2*(precision*recall) / (precision+recall);
+
+
+
+
     % =============================================================
 
     if F1 > bestF1
