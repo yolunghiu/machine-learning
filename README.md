@@ -38,5 +38,9 @@
     + 聚类
     + PCA
 
+- week9
+    + 异常检测（高斯模型）
+    + 推荐系统
+
 ## 4.DL
 >Deep Learning
