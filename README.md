@@ -44,3 +44,13 @@
 
 ## 4.DL
 >Deep Learning
+
+## 5.ML
+>Machine Learning中的其他问题以及资源
+
+- MIT线性代数
+
+- Gaussian Mixture Model(GMM)
+
+- 张志华机器学习
+    
