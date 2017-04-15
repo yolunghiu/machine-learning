@@ -1,8 +1,8 @@
 %% Author: Lu, Chia-Feng 2013.10.11
 clear,
 %% initialize parameters
-offset=0;       % use Binary Viewer to check how many bytes should be skipped
-channelno=64;     % record in the *.vhdr file
+offset=178;       % use Binary Viewer to check how many bytes should be skipped
+channelno=40;     % record in the *.vhdr file
 datapoint=93040;  % record in the *.vhdr file
 
 %% define the full_filepath

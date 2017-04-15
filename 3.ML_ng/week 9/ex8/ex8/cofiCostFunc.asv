@@ -41,9 +41,12 @@ Theta_grad = zeros(size(Theta));
 %                     partial derivatives w.r.t. to each element of Theta
 %
 %% 计算代价函数
-rank = (X*Theta' -Y).*R;
-rankSquare = rank.*rank;
-J = (1/2) * sum(rankSquare(:));
+J = (1/2) * (X*Theta'.*R -Y)
+
+
+
+
+
 
 %% 计算梯度
 grad = [X_grad(:); Theta_grad(:)];
