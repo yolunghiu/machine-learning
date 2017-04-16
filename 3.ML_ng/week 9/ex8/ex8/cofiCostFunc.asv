@@ -44,8 +44,6 @@ Theta_grad = zeros(size(Theta));
 rank = (X*Theta' -Y).*R;
 rankSquare = rank.*rank;
 J = (1/2) * sum(rankSquare(:));
-% 正则化J
-J = J + (lambda/2)*sum(sum(Theta.*Theta)) + (lambda/2)*sum(sum(X.*X));
 
 %% 计算梯度
 for i=1:num_movies
@@ -54,17 +52,13 @@ for i=1:num_movies
     Theta_temp = Theta(idx_u,:);
     Y_temp = Y(i,idx_u);
     X_grad(i,:) = (X(i,:)*Theta_temp' - Y_temp) * Theta_temp;
-    % 正则化
-    X_grad(i,:) =  X_grad(i,:) + lambda*X(i,:);
 end
 
 for j=1:num_users
    idx_m = find(R(:,j)==1);
    X_temp = X(idx_m,:);
    Y_temp = Y(idx_m,j);
-   Theta_grad(j,:) = (X_temp*Theta(j,:)' - Y_temp)' * X_temp;
-    % 正则化
-   Theta_grad(j,:) =  Theta_grad(j,:) + lambda*Theta(j,:);
+   Theta_grad(j) = (X_temp*Theta(j,:))'
 end
 
 grad = [X_grad(:); Theta_grad(:)];

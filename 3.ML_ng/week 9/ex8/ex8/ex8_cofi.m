@@ -79,8 +79,8 @@ fprintf('\nChecking Gradients (without regularization) ... \n');
 %  Check gradients by running checkNNGradients
 checkCostFunction;
 
-fprintf('\nProgram paused. Press enter to continue.\n');
-pause;
+% fprintf('\nProgram paused. Press enter to continue.\n');
+% pause;
 
 
 %% ========= Part 4: Collaborative Filtering Cost Regularization ========
@@ -96,8 +96,8 @@ J = cofiCostFunc([X(:) ; Theta(:)], Y, R, num_users, num_movies, ...
 fprintf(['Cost at loaded parameters (lambda = 1.5): %f '...
          '\n(this value should be about 31.34)\n'], J);
 
-fprintf('\nProgram paused. Press enter to continue.\n');
-pause;
+% fprintf('\nProgram paused. Press enter to continue.\n');
+% pause;
 
 
 %% ======= Part 5: Collaborative Filtering Gradient Regularization ======
@@ -111,8 +111,8 @@ fprintf('\nChecking Gradients (with regularization) ... \n');
 %  Check gradients by running checkNNGradients
 checkCostFunction(1.5);
 
-fprintf('\nProgram paused. Press enter to continue.\n');
-pause;
+% fprintf('\nProgram paused. Press enter to continue.\n');
+% pause;
 
 
 %% ============== Part 6: Entering ratings for a new user ===============
@@ -153,8 +153,8 @@ for i = 1:length(my_ratings)
     end
 end
 
-fprintf('\nProgram paused. Press enter to continue.\n');
-pause;
+% fprintf('\nProgram paused. Press enter to continue.\n');
+% pause;
 
 
 %% ================== Part 7: Learning Movie Ratings ====================
@@ -207,8 +207,8 @@ Theta = reshape(theta(num_movies*num_features+1:end), ...
 
 fprintf('Recommender system learning completed.\n');
 
-fprintf('\nProgram paused. Press enter to continue.\n');
-pause;
+% fprintf('\nProgram paused. Press enter to continue.\n');
+% pause;
 
 %% ================== Part 8: Recommendation for you ====================
 %  After training the model, you can now make recommendations by computing
