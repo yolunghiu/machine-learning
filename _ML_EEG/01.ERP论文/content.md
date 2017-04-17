@@ -1,0 +1,105 @@
+## Abstract
+- 用erp诱发出不同人对刺激的不同反应
+
+## INTRODUCTION
+
+- 刺激是必要的
+	>While this makes it convenient to collect, the fact that it
+	is collected in the absence of stimulation means that the
+	mental states of the user are under no experimental control
+	during its collection. Thus, two users ostensibly undergoing
+	the same biometric enrollment and challenge protocol might
+	actually be in very different cognitive states, both from each
+	other and across acquisition sessions, making the classifier’s
+	task much more difficult. Additionally, because the EEG is
+	often analyzed in the frequency domain for biometric use, it’s
+	temporal resolution is extremely poor.
+
+- 实验所用刺激
+	![s](stimulus.png)
+
+- time-locked?
+
+- 假设
+	>We hypothesized that, by controlling the cognitive state
+of users through specific modes of stimulation likely to
+produce differential responses across participants, especially
+when multiple modes are combined, we would be able to
+achieve higher biometric identification accuracy than has been
+achieved in the past by protocols that do not control the
+cognitive state of the user or that do not combine multiple
+modes of stimulation.
+
+## THE CEREBRE PROTOCOL
+
+- 方法
+	通过五类刺激来实现脑电的分类
+
+- 五个刺激类别
+	- Sine gratings
+	- Low frequency words
+	- Images of foods（图片选择问题）
+	- Celebrity Faces（图片选择问题）
+	- Oddball stimuli：（P300？）四分之一的图片是有颜色的，当有颜色的图片出现时，受试者被要求按下一个按钮
+	- plus(pass-thought)
+
+- 为什么这五个类别叠加起来很有效 <br>
+	拿两类举例，首先每个人喜欢的食物可能不一样，就算一样，这两个人的词汇量也不可能完全一样，这样五类下来，区分度就很大了。另一方面，正弦波会使视觉方面的大脑皮层比较活跃，而食物可能会使嗅觉方面的大脑皮层比较活跃
+
+## METHODS
+
+- Participants <br>
+	50个受试者
+
+- Materials
+	>participants were exposed to 400 images,100 sine gratings, 100 low frequency words,100 images of foods, and 100 celebrity faces. 300 of the 400 were presented in black and white, and a different random 100 for each participant were selected, without	replacement, and presented in color
+
+- Procedure <br>
+	- pass-thought
+	- eye movements and muscle tension
+	- when the black key icon appeared, they were to think of their pass-thought
+	- The 400 images were broken into 4 blocks of 100 images each, and participants were given breaks between blocks
+	- The total duration of the experiment was approximately 1.5 hours, including 0.5 hour for electrode placement and variable time in the breaks between blocks. Each block lasted approximately 5 minutes and there were 6 blocks in total.
+
+- EEG Recording
+	- The EEG was recorded from 26 active Ag/AgCl ring electrodes placed in an elastic EasyCap with a geodesic arrangement.
+	- EOG？
+
+- Classification
+	- cross-correlation
+	- the cross-correlator was more accurate than any other single classifier, including SVM
+	- reference ERP  challenge ERP
+	- ![c](classifier.png)
+	- >each participant’s challenge ERP was cross-correlated with their own reference ERP (self-self) and with the reference ERP of the 49 other participants also in the system (self-other).
+	- 不需要特征提取
+	- 上面所做的分类是基于某个通道、某个刺激做的分类，并没有把所有类型的刺激结合起来一起使用
+
+- RESULTS
+	- ![a](accu.png)
+	- ![s](scalp.png)
+	- 从上面的图可以看出来，单通道、一个刺激的准确率并不能达到100%，那么将所有通道所有刺激结合起来的效果可能很好
+	-  including votes from all 30 channels and all 6 stimulus types (for a total of 180 votes per challenge ERP). This classifier achieved 100% identification accuracy
+	- 通过这种方式，实现了100%的准确率，但是数据量又太大了，可以尝试通过叠加这几个单类分类器来实现
+	- The “minimal” classifier that still allowed 100% identification accuracy included votes from 4 single-item type classifiers (Black and white celebrities, Oddball color targets,Color food and Words) over 3 electrodes, located over the left middle occipital (LMOc), right middle occipital (RMOc) and middle occipital (MiOc) channels.
+	- 另一种减少时间的方法是reduce the number of trials included in the challenge
+	- The minimum number of trials needed in the challenge to produce 100% identification accuracy was 27 trials (=27 seconds) for the maximal classifier. The minimal classifier did not reach 100% accuracy unless all available trials were used.
+
+- DISCUSSION
+    - 通过ERP的方式产生的刺激与EEG比起来，更有可能产生个体差异
+    - 试验结果：
+        1. 所有单通道（single-channel）单刺激的试验结果都比pass-thought好
+        2. 但刺激的分类器中，食物和颜色刺激效果最好（86% 82%）
+				3. when multiple channels and/or stimulus types were allowed to vote in identifying a user, identification accuracy reached 100% in several configurations.
+				4. 将多种刺激的反应结合起来，将得到更高的准确率
+
+	- 作者得出的结论
+		> one reason ERP biometrics are especially accurate is that they provide the ability to tap into functionally distinct brain networks that each provide a distinct identifying information about a person. The limited past work that has explored ERP biometrics ([13], [14]) has not used this approach, of combining types of stimulation, which we suspect may have been why our approach was more accurate
+
+- 一些问题
+	- 回忆的方式准确率不高及可能原因
+	- 所有的刺激都是视觉刺激，但是其他形式的刺激没有视觉刺激及时
+	- 通过这种方式分类，六个月内准确率没有下降
+
+## 总结
+1. 多类刺激虽然准确率高，但是实验太复杂，对于单类刺激，准确率没有达到100%，注意到他的实验是没有进行特征提取的，如果进行特征提取，准确率会不会达到100%？
+2. 本文比较有意义的一点是说明了个体脑电差异可以通过对同一事物的不同反应来体现，尤其是对食物的反应，但是这种差异会不会随着时间的推移而改变（很多年前喜欢一种食物，后来吃腻了，不喜欢了）？
