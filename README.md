@@ -42,6 +42,14 @@
     + 异常检测（高斯模型）
     + 推荐系统
 
+- week10
+    + 随机梯度下降
+    + mini-batch
+
+-week11
+    + OCR
+    + 如何获取人工数据
+
 ## 4.DL
 >Deep Learning
 
