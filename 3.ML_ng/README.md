@@ -33,6 +33,6 @@
     + 随机梯度下降
     + mini-batch
 
--week11
+- week11
     + OCR
     + 如何获取人工数据
