@@ -1,6 +1,7 @@
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [机器学习](#机器学习)
+	- [_Jupyter](#jupyter)
 	- [0.Python](#0python)
 	- [1.MATLAB](#1matlab)
 	- [2.sklearn](#2sklearn)
@@ -11,6 +12,9 @@
 <!-- /TOC -->
 
 # 机器学习
+
+## _Jupyter
+> jupyter notebook
 
 ## 0.Python
 > Python基本语法
@@ -45,3 +49,5 @@
 - Gaussian Mixture Model(GMM)
 
 - 张志华机器学习
+
+- 可汗学院统计学
