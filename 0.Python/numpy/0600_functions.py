@@ -13,3 +13,7 @@ print(np.sum(x, axis=1))
 
 # 转置
 print(x.T)
+
+# 找到数组中某元素的索引
+y = np.array([1,2,3])
+print(np.where(y==3)[0])
