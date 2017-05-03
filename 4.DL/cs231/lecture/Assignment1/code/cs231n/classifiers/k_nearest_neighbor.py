@@ -129,7 +129,18 @@ class KNearestNeighbor(object):
         # HINT: Try to formulate the l2 distance using matrix multiplication    #
         #       and two broadcast sums.                                         #
         #########################################################################
+
+        # L2 = sqrt(X1^2 + X2^2 - 2*X1*X2)
+        dists = dists + np.multiply(-2, np.dot(X, self.X_train.T))    # -2*X1*X2    500x5000
+        squareX = np.sum(np.square(X), axis = 1, keepdims = True)     # X1^2        500x1
+        squareX_train = np.sum(np.square(self.X_train), axis= 1, keepdims= True).T    #X2^2 1x5000
+
+        dists = dists + squareX            # 用Python的broadcast
+        dists = dists + squareX_train      # 用Python的broadcast
+        dists = np.sqrt(dists)
+
         pass
+
         #########################################################################
         #                         END OF YOUR CODE                              #
         #########################################################################
@@ -167,11 +178,9 @@ class KNearestNeighbor(object):
             
             # argsort返回的是数组值从小到大的索引值
             order = np.argsort(dists[i, :])
-            # minIndex = np.argmin(dists[i, :])
 
             # 把前k个的y值存到数组中
-            for j in range(k):
-                closest_y.append(self.y_train[order[j]])
+            closest_y = self.y_train[order[:k]]
 
             pass
             #########################################################################
@@ -182,14 +191,8 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
 
-            # 将closst_y中出现最多的数赋值给预测值'
-            import collections
-            counter = collections.Counter(closest_y)
-            # Counter返回的是一个字典，这个字典的键是数组中的数字，值是其出现次数
-            # 这个字典是按照从多到少的顺序排列的，所以第一个键值对的键就是出现最多的数字
-            idx = list(counter)
 
-            y_pred[i] = idx[0]
+            y_pred[i] = np.argmax(np.bincount(closest_y))
 
             pass
             #########################################################################
