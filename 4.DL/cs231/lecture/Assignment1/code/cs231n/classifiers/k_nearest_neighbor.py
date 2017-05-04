@@ -191,8 +191,12 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
 
-
-            y_pred[i] = np.argmax(np.bincount(closest_y))
+            # bincount函数要求传入的数组是int型
+            closest_y.dtype = np.int
+            
+            count = np.bincount(closest_y)
+            maxY = np.argmax(count)
+            y_pred[i] = maxY
 
             pass
             #########################################################################
