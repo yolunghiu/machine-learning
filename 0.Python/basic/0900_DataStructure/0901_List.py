@@ -20,3 +20,6 @@ a.remove(333)
 # 取反
 a.reverse()
 
+# [0,1,2,3,...]
+b = list(range(10))
+
