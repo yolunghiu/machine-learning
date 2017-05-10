@@ -1,92 +1,132 @@
 import numpy as np
 from random import shuffle
 
+
 def svm_loss_naive(W, X, y, reg):
-  """
-  Structured SVM loss function, naive implementation (with loops).
+    """
+    Structured SVM loss function, naive implementation (with loops).
+  
+    Inputs have dimension D, there are C classes, and we operate on minibatches
+    of N examples.
+  
+    D:特征数（3073），C:类别数（10）
+    N:样本数
+  
+    Inputs:
+    - W: A numpy array of shape (D, C) containing weights.
+    - X: A numpy array of shape (N, D) containing a minibatch of data.
+    - y: A numpy array of shape (N,) containing training labels; y[i] = c means
+      that X[i] has label c, where 0 <= c < C.
+    - reg: (float) regularization strength
+  
+    Returns a tuple of:
+    - loss as single float
+    - gradient with respect to weights W; an array of same shape as W
+    """
+    dW = np.zeros(W.shape)  # initialize the gradient as zero
 
-  Inputs have dimension D, there are C classes, and we operate on minibatches
-  of N examples.
+    # compute the loss and the gradient
+    num_classes = W.shape[1]
+    num_train = X.shape[0]
+    loss = 0.0
 
-  Inputs:
-  - W: A numpy array of shape (D, C) containing weights.
-  - X: A numpy array of shape (N, D) containing a minibatch of data.
-  - y: A numpy array of shape (N,) containing training labels; y[i] = c means
-    that X[i] has label c, where 0 <= c < C.
-  - reg: (float) regularization strength
+    for i in range(num_train):
+        scores = X[i].dot(W)  # 1*10
+        correct_class_score = scores[y[i]]
 
-  Returns a tuple of:
-  - loss as single float
-  - gradient with respect to weights W; an array of same shape as W
-  """
-  dW = np.zeros(W.shape) # initialize the gradient as zero
+        # 所有得分的margin
+        margins = scores - correct_class_score + 1  # note delta = 1
+        margins[y[i]] = 0
 
-  # compute the loss and the gradient
-  num_classes = W.shape[1]
-  num_train = X.shape[0]
-  loss = 0.0
-  for i in range(num_train):
-    scores = X[i].dot(W)
-    correct_class_score = scores[y[i]]
-    for j in range(num_classes):
-      if j == y[i]:
-        continue
-      margin = scores[j] - correct_class_score + 1 # note delta = 1
-      if margin > 0:
-        loss += margin
+        # 求出当前样本的margin有几个大于0（为loss作了贡献）
+        count = 0
+        for m in range(num_classes):
+            if margins[m] > 0:
+                count += 1
+        # 如果count>0，在这里就可以得出dW[:,y[i]]
+        if count > 0:
+            dW[:, y[i]] += -count * X[i,:].T
 
-  # Right now the loss is a sum over all training examples, but we want it
-  # to be an average instead so we divide by num_train.
-  loss /= num_train
+        # dW（梯度）是 3073*10 的矩阵
+        # 下面求损失函数的同时，顺带求梯度
+        for j in range(num_classes):
+            if j == y[i]:
+                continue
+            if margins[j] > 0:
+                loss += margins[j]
+                dW[:, j] += X[i,:].T
 
-  # Add regularization to the loss.
-  loss += reg * np.sum(W * W)
+    loss /= num_train
+    loss += reg * np.sum(W * W)
 
-  #############################################################################
-  # TODO:                                                                     #
-  # Compute the gradient of the loss function and store it dW.                #
-  # Rather that first computing the loss and then computing the derivative,   #
-  # it may be simpler to compute the derivative at the same time that the     #
-  # loss is being computed. As a result you may need to modify some of the    #
-  # code above to compute the gradient.                                       #
-  #############################################################################
+    # 梯度dW是3073*10的矩阵
+    # 梯度求平均
+    dW /= num_train
+    dW += 2 * reg * W
 
+    #############################################################################
+    # TODO:                                                                     #
+    # Compute the gradient of the loss function and store it dW.                #
+    # Rather than first computing the loss and then computing the derivative,   #
+    # it may be simpler to compute the derivative at the same time that the     #
+    # loss is being computed. As a result you may need to modify some of the    #
+    # code above to compute the gradient.                                       #
+    #############################################################################
 
-  return loss, dW
+    return loss, dW
 
 
 def svm_loss_vectorized(W, X, y, reg):
-  """
-  Structured SVM loss function, vectorized implementation.
+    """
+    Structured SVM loss function, vectorized implementation.
+  
+    Inputs and outputs are the same as svm_loss_naive.
+    """
+    loss = 0.0
+    dW = np.zeros(W.shape)  # initialize the gradient as zero
 
-  Inputs and outputs are the same as svm_loss_naive.
-  """
-  loss = 0.0
-  dW = np.zeros(W.shape) # initialize the gradient as zero
+    #############################################################################
+    # TODO:                                                                     #
+    # Implement a vectorized version of the structured SVM loss, storing the    #
+    # result in loss.                                                           #
+    #############################################################################
 
-  #############################################################################
-  # TODO:                                                                     #
-  # Implement a vectorized version of the structured SVM loss, storing the    #
-  # result in loss.                                                           #
-  #############################################################################
-  pass
-  #############################################################################
-  #                             END OF YOUR CODE                              #
-  #############################################################################
+    num_classes = W.shape[1]
+    num_train = X.shape[0]
+
+    # 首先计算所有样本的得分
+    scores = X.dot(W)        # m*10
+
+    # 然后计算margins
+    idx = np.array(range(num_train))
+    margins = (scores.T - scores[idx,y]).T + 1    # delta = 1
+    margins[idx,y] = 0
+
+    # margins中所有大于0的元素相加就是损失函数
+    mask = margins > 0
+    loss = np.sum(margins[mask])
+
+    loss /= num_train
+    loss += reg * np.sum(W * W)
+
+    pass
+    #############################################################################
+    #                             END OF YOUR CODE                              #
+    #############################################################################
 
 
-  #############################################################################
-  # TODO:                                                                     #
-  # Implement a vectorized version of the gradient for the structured SVM     #
-  # loss, storing the result in dW.                                           #
-  #                                                                           #
-  # Hint: Instead of computing the gradient from scratch, it may be easier    #
-  # to reuse some of the intermediate values that you used to compute the     #
-  # loss.                                                                     #
-  #############################################################################
-  pass
-  #############################################################################
-  #                             END OF YOUR CODE                              #
-  #############################################################################
+    #############################################################################
+    # TODO:                                                                     #
+    # Implement a vectorized version of the gradient for the structured SVM     #
+    # loss, storing the result in dW.                                           #
+    #                                                                           #
+    # Hint: Instead of computing the gradient from scratch, it may be easier    #
+    # to reuse some of the intermediate values that you used to compute the     #
+    # loss.                                                                     #
+    #############################################################################
+    pass
+    #############################################################################
+    #                             END OF YOUR CODE                              #
+    #############################################################################
 
-  return loss, dW
+    return loss, dW

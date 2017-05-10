@@ -17,3 +17,11 @@ print(x.T)
 # 找到数组中某元素的索引
 y = np.array([1,2,3])
 print(np.where(y==3)[0])
+
+# reshape
+a  = np.ones((3,3,3))
+print('\na.shape: ', a.shape)
+
+a = np.reshape(a,(3,-1))
+print('\nafter reshape, a.shape: ', a.shape)
+
