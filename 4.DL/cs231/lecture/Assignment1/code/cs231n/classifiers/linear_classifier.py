@@ -51,6 +51,12 @@ class LinearClassifier(object):
             # Hint: Use np.random.choice to generate indices. Sampling with         #
             # replacement is faster than sampling without replacement.              #
             #########################################################################
+
+            # replace=True,选取的样本中可能有重复值，不过这也没啥关系
+            batchIndex = np.random.choice(y, batch_size, replace=True)
+            X_batch = X[batchIndex, :]
+            y_batch = y[batchIndex]
+
             pass
             #########################################################################
             #                       END OF YOUR CODE                                #
@@ -65,11 +71,15 @@ class LinearClassifier(object):
             # TODO:                                                                 #
             # Update the weights using the gradient and the learning rate.          #
             #########################################################################
+
+            self.W -= learning_rate * grad
+
             pass
             #########################################################################
             #                       END OF YOUR CODE                                #
             #########################################################################
 
+            # 每一百次打印一次准确率
             if verbose and it % 100 == 0:
                 print('iteration %d / %d: loss %f' % (it, num_iters, loss))
 
@@ -94,6 +104,12 @@ class LinearClassifier(object):
         # TODO:                                                                   #
         # Implement this method. Store the predicted labels in y_pred.            #
         ###########################################################################
+
+        # X的得分（10个类别）
+        scores = np.dot(X,self.W);
+        # 预测值是得分最大值的索引
+        y_pred = np.argmax(scores,axis=1)
+
         pass
         ###########################################################################
         #                           END OF YOUR CODE                              #
@@ -120,10 +136,6 @@ class LinearClassifier(object):
 
 class LinearSVM(LinearClassifier):
     """ A subclass that uses the Multiclass SVM loss function """
-
-    def train(self, X, y, learning_rate=1e-3, reg=1e-5, num_iters=100, verbose=False):
-        loss_history =
-        return
 
     def loss(self, X_batch, y_batch, reg):
         return svm_loss_vectorized(self.W, X_batch, y_batch, reg)
