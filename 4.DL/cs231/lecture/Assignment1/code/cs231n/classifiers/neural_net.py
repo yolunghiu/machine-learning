@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import numpy as np
 import matplotlib.pyplot as plt
-from past.builtins import xrange
 
 class TwoLayerNet(object):
   """
@@ -71,32 +70,28 @@ class TwoLayerNet(object):
 
     # Compute the forward pass
     scores = None
-    #############################################################################
-    # TODO: Perform the forward pass, computing the class scores for the input. #
-    # Store the result in the scores variable, which should be an array of      #
-    # shape (N, C).                                                             #
-    #############################################################################
+    # ReLu激活函数只在hidden layer使用
+    hidden = np.maximum(0, np.dot(X,W1) + b1)
+    scores = np.dot(hidden, W2) + b2
     pass
-    #############################################################################
-    #                              END OF YOUR CODE                             #
-    #############################################################################
-    
+
     # If the targets are not given then jump out, we're done
     if y is None:
       return scores
 
     # Compute the loss
     loss = None
-    #############################################################################
-    # TODO: Finish the forward pass, and compute the loss. This should include  #
-    # both the data loss and L2 regularization for W1 and W2. Store the result  #
-    # in the variable loss, which should be a scalar. Use the Softmax           #
-    # classifier loss.                                                          #
-    #############################################################################
+
+    # data loss
+    # 减去最大值会使下面的计算更稳定，且对结果没有影响
+    exp_scores = np.exp(scores)
+    probs = exp_scores / np.sum(exp_scores,axis=1,keepdims=True)
+    corect_logprobs = -np.log(probs[range(N),y])
+    data_loss = np.sum(corect_logprobs)/N
+
+    loss = data_loss + 0.5*reg*np.sum(W1*W1) + 0.5*reg*np.sum(W2*W2)
+
     pass
-    #############################################################################
-    #                              END OF YOUR CODE                             #
-    #############################################################################
 
     # Backward pass: compute gradients
     grads = {}
@@ -105,6 +100,24 @@ class TwoLayerNet(object):
     # and biases. Store the results in the grads dictionary. For example,       #
     # grads['W1'] should store the gradient on W1, and be a matrix of same size #
     #############################################################################
+    dscores = probs
+    dscores[range(N),y] -= 1
+    dscores /= N
+    dW2 = np.dot(hidden.T, dscores)
+    db2 = np.sum(dscores, axis=0, keepdims=True)
+    dhidden = np.dot(dscores,W2.T)
+    dhidden[hidden<=0] = 0
+    dW1 = np.dot(X.T,dhidden)
+    db1 = np.sum(dhidden, axis=0, keepdims=True)
+
+    dW2 += reg * W2
+    dW1 += reg * W1
+
+    grads['W1'] = dW1
+    grads['b1'] = db1
+    grads['W2'] = dW2
+    grads['b2'] = db2
+
     pass
     #############################################################################
     #                              END OF YOUR CODE                             #
@@ -141,7 +154,7 @@ class TwoLayerNet(object):
     train_acc_history = []
     val_acc_history = []
 
-    for it in xrange(num_iters):
+    for it in range(num_iters):
       X_batch = None
       y_batch = None
 
