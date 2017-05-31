@@ -36,9 +36,11 @@ class TwoLayerNet(object):
         - output_size: The number of classes C.
         """
         self.params = {}
-        self.params['W1'] = std * np.random.randn(input_size, hidden_size)
+        # self.params['W1'] = std * np.random.randn(input_size, hidden_size)
+        self.params['W1'] = std * np.random.randn(input_size, hidden_size) / np.sqrt(2.0/input_size)
         self.params['b1'] = np.zeros(hidden_size)
-        self.params['W2'] = std * np.random.randn(hidden_size, output_size)
+        # self.params['W2'] = std * np.random.randn(hidden_size, output_size)
+        self.params['W2'] = std * np.random.randn(hidden_size, output_size) / np.sqrt(2.0/hidden_size)
         self.params['b2'] = np.zeros(output_size)
 
     def loss(self, X, y=None, reg=0.0):
@@ -149,20 +151,20 @@ class TwoLayerNet(object):
         num_train = X.shape[0]
         # 这个参数的意思是所有样本完成一次正向传递和反向传递需要多少次迭代
         # 如果num_train < batch_size(toy data),这个参数设为1
-        iterations_per_epoch = max(num_train / batch_size, 1)
+        iterations_per_epoch = int(max(num_train / batch_size, 1))
 
         # Use SGD to optimize the parameters in self.model
         loss_history = []
         train_acc_history = []
         val_acc_history = []
 
-        # beta1 = 0.9
-        # beta2 = 0.999
-        # eps = 1e-8
-        # mW1 = np.zeros_like(self.params['W1'])
-        # mW2 = np.zeros_like(self.params['W2'])
-        # mb1 = np.zeros_like(self.params['b1'])
-        # mb2 = np.zeros_like(self.params['b2'])
+        beta1 = 0.9
+        beta2 = 0.999
+        eps = 1e-8
+        mW1 = np.zeros_like(self.params['W1'])
+        mW2 = np.zeros_like(self.params['W2'])
+        mb1 = np.zeros_like(self.params['b1'])
+        mb2 = np.zeros_like(self.params['b2'])
         vW1 = np.zeros_like(self.params['W1'])
         vW2 = np.zeros_like(self.params['W2'])
         vb1 = np.zeros_like(self.params['b1'])
@@ -206,27 +208,27 @@ class TwoLayerNet(object):
             db1 = grads['b1']
             db2 = grads['b2']
 
-            vW1 = mu * vW1 -learning_rate * dW1
-            vW2 = mu * vW2 - learning_rate * dW2
-            vb1 = mu * vb1 - learning_rate * db1
-            vb2 = mu * vb2 - learning_rate * db2
-            self.params['W1'] += vW1
-            self.params['W2'] += vW2
-            self.params['b1'] += np.reshape(vb1, self.params['b1'].shape)
-            self.params['b2'] += np.reshape(vb2, self.params['b2'].shape)
+            # vW1 = mu * vW1 -learning_rate * dW1
+            # vW2 = mu * vW2 - learning_rate * dW2
+            # vb1 = mu * vb1 - learning_rate * db1
+            # vb2 = mu * vb2 - learning_rate * db2
+            # self.params['W1'] += vW1
+            # self.params['W2'] += vW2
+            # self.params['b1'] += np.reshape(vb1, self.params['b1'].shape)
+            # self.params['b2'] += np.reshape(vb2, self.params['b2'].shape)
 
-            # mW1 = beta1*mW1 + (1-beta1)*dW1
-            # vW1 = beta2*vW1 + (1-beta2)*(dW1**2)
-            # self.params['W1'] += -learning_rate * mW1 / (np.sqrt(vW1) + eps)
-            # mW2 = beta1*mW2 + (1-beta1)*dW2
-            # vW2 = beta2*vW2 + (1-beta2)*(dW2**2)
-            # self.params['W2'] += -learning_rate * mW2 / (np.sqrt(vW2) + eps)
-            # mb1 = beta1*mb1 + (1-beta1)*db1
-            # vb1 = beta2*vb1 + (1-beta2)*(db1**2)
-            # self.params['b1'] += np.reshape(-learning_rate * mb1 / (np.sqrt(vb1) + eps), (self.params['b1'].shape))
-            # mb2 = beta1*mb2 + (1-beta1)*db2
-            # vb2 = beta2*vb2 + (1-beta2)*(db2**2)
-            # self.params['b2'] += np.reshape(-learning_rate * mb2 / (np.sqrt(vb2) + eps), (self.params['b2'].shape))
+            mW1 = beta1*mW1 + (1-beta1)*dW1
+            vW1 = beta2*vW1 + (1-beta2)*(dW1**2)
+            self.params['W1'] += -learning_rate * mW1 / (np.sqrt(vW1) + eps)
+            mW2 = beta1*mW2 + (1-beta1)*dW2
+            vW2 = beta2*vW2 + (1-beta2)*(dW2**2)
+            self.params['W2'] += -learning_rate * mW2 / (np.sqrt(vW2) + eps)
+            mb1 = beta1*mb1 + (1-beta1)*db1
+            vb1 = beta2*vb1 + (1-beta2)*(db1**2)
+            self.params['b1'] += np.reshape(-learning_rate * mb1 / (np.sqrt(vb1) + eps), (self.params['b1'].shape))
+            mb2 = beta1*mb2 + (1-beta1)*db2
+            vb2 = beta2*vb2 + (1-beta2)*(db2**2)
+            self.params['b2'] += np.reshape(-learning_rate * mb2 / (np.sqrt(vb2) + eps), (self.params['b2'].shape))
 
             pass
 
@@ -243,12 +245,6 @@ class TwoLayerNet(object):
 
                 # Decay learning rate
                 learning_rate *= learning_rate_decay
-            if it>50 and it<=100 :
-                mu = mu_all[1]
-            elif it>100 and it<=150:
-                mu = mu_all[2]
-            elif it>150:
-                mu = mu_all[3]
 
         return {
             'loss_history': loss_history,
