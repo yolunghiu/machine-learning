@@ -2,6 +2,7 @@ from builtins import range
 import numpy as np
 
 
+# 这个函数计算的是不用任何激活函数得到的正向传播结果
 def affine_forward(x, w, b):
     """
     Computes the forward pass for an affine (fully-connected) layer.
@@ -25,10 +26,17 @@ def affine_forward(x, w, b):
     # TODO: Implement the affine forward pass. Store the result in out. You   #
     # will need to reshape the input into rows.                               #
     ###########################################################################
+
+    shape_x = x.shape
+    num_train = x.shape[0]
+    sample_dim = np.prod(x.shape[1:])  # 每个样本转成向量之后的长度
+
+    x = x.reshape(num_train, sample_dim)
+    out = np.dot(x, w) + b
+    x = x.reshape(shape_x)
+
     pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
+
     cache = (x, w, b)
     return out, cache
 
@@ -53,10 +61,16 @@ def affine_backward(dout, cache):
     ###########################################################################
     # TODO: Implement the affine backward pass.                               #
     ###########################################################################
+    shape_x = x.shape
+    x = x.reshape(x.shape[0], np.prod(x.shape[1:]))
+
+    dx = np.dot(dout, w.T)
+    dx = dx.reshape(shape_x)
+    dw = np.dot(x.T, dout)
+    db = np.sum(dout, axis=0, keepdims=True)
+
     pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
+
     return dx, dw, db
 
 
@@ -75,6 +89,7 @@ def relu_forward(x):
     ###########################################################################
     # TODO: Implement the ReLU forward pass.                                  #
     ###########################################################################
+    out = np.maximum(0, x)
     pass
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -94,10 +109,13 @@ def relu_backward(dout, cache):
     Returns:
     - dx: Gradient with respect to x
     """
+    # 这个cache里存的x实际上是ReLU计算出的score
     dx, x = None, cache
     ###########################################################################
     # TODO: Implement the ReLU backward pass.                                 #
     ###########################################################################
+    dx = dout
+    dx[x<=0] = 0
     pass
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -525,6 +543,7 @@ def svm_loss(x, y):
     margins = np.maximum(0, x - correct_class_scores[:, np.newaxis] + 1.0)
     margins[np.arange(N), y] = 0
     loss = np.sum(margins) / N
+
     num_pos = np.sum(margins > 0, axis=1)
     dx = np.zeros_like(x)
     dx[margins > 0] = 1
@@ -547,12 +566,18 @@ def softmax_loss(x, y):
     - loss: Scalar giving the loss
     - dx: Gradient of the loss with respect to x
     """
+    # score - max(score, axis=1), 为了计算的稳定性
     shifted_logits = x - np.max(x, axis=1, keepdims=True)
+    # Z是每行escore之和
     Z = np.sum(np.exp(shifted_logits), axis=1, keepdims=True)
+
     log_probs = shifted_logits - np.log(Z)
+
     probs = np.exp(log_probs)
     N = x.shape[0]
     loss = -np.sum(log_probs[np.arange(N), y]) / N
+
+    # copy()方法是重新分配内存，而直接的赋值只是引用的复制，对b的修改会反应到a上
     dx = probs.copy()
     dx[np.arange(N), y] -= 1
     dx /= N

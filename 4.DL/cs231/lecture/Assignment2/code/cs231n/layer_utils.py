@@ -2,7 +2,7 @@ pass
 from cs231n.layers import *
 from cs231n.fast_layers import *
 
-
+# 这个函数将自己实现的一般正向传播和ReLU激活函数结合起来了
 def affine_relu_forward(x, w, b):
     """
     Convenience layer that perorms an affine transform followed by a ReLU
@@ -15,12 +15,13 @@ def affine_relu_forward(x, w, b):
     - out: Output from the ReLU
     - cache: Object to give to the backward pass
     """
-    a, fc_cache = affine_forward(x, w, b)
-    out, relu_cache = relu_forward(a)
+    score, fc_cache = affine_forward(x, w, b)
+    out, relu_cache = relu_forward(score)
     cache = (fc_cache, relu_cache)
     return out, cache
 
-
+# 同理，将计算score的反向传播和ReLU的反向传播结合起来
+# 先计算max的导数，然后再计算其他导数
 def affine_relu_backward(dout, cache):
     """
     Backward pass for the affine-relu convenience layer
