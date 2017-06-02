@@ -526,6 +526,7 @@ def spatial_batchnorm_backward(dout, cache):
 
 def svm_loss(x, y):
     """
+    这里的实现没加L2 regularization
     Computes the loss and gradient using for multiclass SVM classification.
 
     Inputs:
@@ -575,10 +576,11 @@ def softmax_loss(x, y):
 
     probs = np.exp(log_probs)
     N = x.shape[0]
+    # 这里的loss是没有正则化的loss，因为正则化需要的参数不在这个类中，所以正则化放在这里是不合适的
     loss = -np.sum(log_probs[np.arange(N), y]) / N
 
     # copy()方法是重新分配内存，而直接的赋值只是引用的复制，对b的修改会反应到a上
-    dx = probs.copy()
-    dx[np.arange(N), y] -= 1
-    dx /= N
-    return loss, dx
+    dscore = probs.copy()
+    dscore[np.arange(N), y] -= 1
+    dscore /= N
+    return loss, dscore
