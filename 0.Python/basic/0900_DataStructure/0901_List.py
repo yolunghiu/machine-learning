@@ -5,6 +5,12 @@ print('a的类型：' + type(a).__name__)
 
 print('333出现的次数：' + str(a.count(333)))
 
+print('a的长度：', len(a))
+print('遍历a：')
+for i in range(len(a)):
+	print(a[i])
+print('遍历a结束')
+
 # 插入、添加
 a.insert(2, -1)
 a.append(333)

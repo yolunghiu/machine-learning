@@ -13,14 +13,17 @@ from cs231n import optim
 
 class Solver(object):
     """
+    优化算法定义在optim.py中
     A Solver encapsulates all the logic necessary for training classification
     models. The Solver performs stochastic gradient descent using different
     update rules defined in optim.py.
 
+    在trainset和validationset上测试可以观测是否过拟合（在训练集上效果好，验证集上效果却很差）
     The solver accepts both training and validataion data and labels so it can
     periodically check classification accuracy on both training and validation
     data to watch out for overfitting.
 
+    传入各种所需参数，构造一个solver类，调用其train()方法
     To train a model, you will first construct a Solver instance, passing the
     model, dataset, and various optoins (learning rate, batch size, etc) to the
     constructor. You will then call the train() method to run the optimization
