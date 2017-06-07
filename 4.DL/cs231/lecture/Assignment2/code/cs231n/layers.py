@@ -186,10 +186,14 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         # variance, storing your result in the running_mean and running_var   #
         # variables.                                                          #
         #######################################################################
+        mean = np.mean(x,axis = 0)
+        var = np.var(x,axis = 0)
+        running_mean = running_mean * momentum + (1-momentum) * mean
+        running_var = running_var * momentum + (1-momentum) * var
+        out_media = (x-mean)/np.sqrt(var + eps)
+        out = (out_media + beta) * gamma
+        cache = (out_media,x,mean,var,beta,gamma,eps)
         pass
-        #######################################################################
-        #                           END OF YOUR CODE                          #
-        #######################################################################
     elif mode == 'test':
         #######################################################################
         # TODO: Implement the test-time forward pass for batch normalization. #
@@ -197,10 +201,10 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         # then scale and shift the normalized data using gamma and beta.      #
         # Store the result in the out variable.                               #
         #######################################################################
+        out_media = (x-running_mean)/np.sqrt(running_var + eps)
+        out = (out_media + beta) * gamma
+        cache = (out,x,running_mean,running_var,beta,gamma,eps)
         pass
-        #######################################################################
-        #                          END OF YOUR CODE                           #
-        #######################################################################
     else:
         raise ValueError('Invalid forward batchnorm mode "%s"' % mode)
 
