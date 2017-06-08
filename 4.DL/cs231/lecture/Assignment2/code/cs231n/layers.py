@@ -1,4 +1,3 @@
-from builtins import range
 import numpy as np
 
 
@@ -188,11 +187,15 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         #######################################################################
         mean = np.mean(x,axis = 0)
         var = np.var(x,axis = 0)
+
         running_mean = running_mean * momentum + (1-momentum) * mean
         running_var = running_var * momentum + (1-momentum) * var
+
         out_media = (x-mean)/np.sqrt(var + eps)
-        out = (out_media + beta) * gamma
+        out = out_media * gamma + beta
+
         cache = (out_media,x,mean,var,beta,gamma,eps)
+
         pass
     elif mode == 'test':
         #######################################################################
@@ -202,8 +205,10 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         # Store the result in the out variable.                               #
         #######################################################################
         out_media = (x-running_mean)/np.sqrt(running_var + eps)
-        out = (out_media + beta) * gamma
+        out = out_media* gamma + beta
+
         cache = (out,x,running_mean,running_var,beta,gamma,eps)
+
         pass
     else:
         raise ValueError('Invalid forward batchnorm mode "%s"' % mode)
@@ -237,10 +242,22 @@ def batchnorm_backward(dout, cache):
     # TODO: Implement the backward pass for batch normalization. Store the    #
     # results in the dx, dgamma, and dbeta variables.                         #
     ###########################################################################
+    out_media, x, mean, var, beta, gamma, eps = cache
+
+    dout_media = dout * gamma
+
+    dvar = np.sum(- dout_media * (x-mean) * (-0.5) * ((var+eps)**(-1.5)) , axis=0, keepdims=True)
+
+    dmean1 = np.sum(- dout_media * (var+eps)**(-0.5), axis=0, keepdims=True)
+    dmean2 =  dvar * (np.sum(-2*(x-mean), axis=0, keepdims=True)/x.shape[0])
+    dmean = dmean1 + dmean2
+
+    dx = dout_media * (var+eps)**(-0.5) + dvar * ((2*(x-mean))/x.shape[0]) + dmean/x.shape[0]
+
+    dgamma = np.sum(dout * out_media, axis=0, keepdims=True)
+    dbeta = np.sum(dout, axis=0, keepdims=True)
+
     pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
 
     return dx, dgamma, dbeta
 
