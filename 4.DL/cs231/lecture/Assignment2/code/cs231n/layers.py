@@ -191,10 +191,10 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         running_mean = running_mean * momentum + (1-momentum) * mean
         running_var = running_var * momentum + (1-momentum) * var
 
-        out_media = (x-mean)/np.sqrt(var + eps)
-        out = out_media * gamma + beta
+        x_norm = (x-mean)/np.sqrt(var + eps)
+        out = x_norm * gamma + beta
 
-        cache = (out_media,x,mean,var,beta,gamma,eps)
+        cache = (x_norm,x,mean,var,beta,gamma,eps)
 
         pass
     elif mode == 'test':
@@ -204,8 +204,8 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         # then scale and shift the normalized data using gamma and beta.      #
         # Store the result in the out variable.                               #
         #######################################################################
-        out_media = (x-running_mean)/np.sqrt(running_var + eps)
-        out = out_media* gamma + beta
+        x_norm = (x-running_mean)/np.sqrt(running_var + eps)
+        out = x_norm* gamma + beta
 
         cache = (out,x,running_mean,running_var,beta,gamma,eps)
 
@@ -242,22 +242,20 @@ def batchnorm_backward(dout, cache):
     # TODO: Implement the backward pass for batch normalization. Store the    #
     # results in the dx, dgamma, and dbeta variables.                         #
     ###########################################################################
-    out_media, x, mean, var, beta, gamma, eps = cache
-
-    dout_media = dout * gamma
-
-    dvar = np.sum(- dout_media * (x-mean) * (-0.5) * ((var+eps)**(-1.5)) , axis=0, keepdims=True)
-
-    dmean1 = np.sum(- dout_media * (var+eps)**(-0.5), axis=0, keepdims=True)
-    dmean2 =  dvar * (np.sum(-2*(x-mean), axis=0, keepdims=True)/x.shape[0])
-    dmean = dmean1 + dmean2
-
-    dx = dout_media * (var+eps)**(-0.5) + dvar * ((2*(x-mean))/x.shape[0]) + dmean/x.shape[0]
-
-    dgamma = np.sum(dout * out_media, axis=0, keepdims=True)
+    # 这是按论文上的公式实现的
+    x_normalized, x, sample_mean, sample_var, beta, gamma, eps = cache
+    N, D = x.shape
+    dx_normalized = dout * gamma       # [N,D]
+    x_mu = x - sample_mean             # [N,D]
+    sample_std_inv = 1.0 / np.sqrt(sample_var + eps)    # [1,D]
+    dsample_var = -0.5 * np.sum(dx_normalized * x_mu, axis=0, keepdims=True) * sample_std_inv**3
+    dsample_mean = -1.0 * np.sum(dx_normalized * sample_std_inv, axis=0, keepdims=True) - \
+                   2.0 * dsample_var * np.mean(x_mu, axis=0, keepdims=True)
+    dx1 = dx_normalized * sample_std_inv
+    dx2 = 2.0/N * dsample_var * x_mu
+    dx = dx1 + dx2 + 1.0/N * dsample_mean
+    dgamma = np.sum(dout * x_normalized, axis=0, keepdims=True)
     dbeta = np.sum(dout, axis=0, keepdims=True)
-
-    pass
 
     return dx, dgamma, dbeta
 
