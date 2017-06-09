@@ -23,7 +23,7 @@ class TwoLayerNet(object):
     self.params that maps parameter names to numpy arrays.
     """
 
-    def __init__(self, input_dim=3*32*32, hidden_dim=100, num_classes=10,
+    def __init__(self, input_dim=3 * 32 * 32, hidden_dim=100, num_classes=10,
                  weight_scale=1e-3, reg=0.0):
         """
         Initialize a new network.
@@ -57,7 +57,6 @@ class TwoLayerNet(object):
 
         pass
 
-
     def loss(self, X, y=None):
         """
         Compute loss and gradient for a minibatch of data.
@@ -82,8 +81,8 @@ class TwoLayerNet(object):
         # TODO: Implement the forward pass for the two-layer net, computing the    #
         # class scores for X and storing them in the scores variable.              #
         ############################################################################
-        hidden,cache1 = affine_relu_forward(X, self.params['W1'], self.params['b1'])
-        scores,cache2 = affine_forward(hidden, self.params['W2'], self.params['b2'])
+        hidden, cache1 = affine_relu_forward(X, self.params['W1'], self.params['b1'])
+        scores, cache2 = affine_forward(hidden, self.params['W2'], self.params['b2'])
         pass
 
         # If y is None then we are in test mode so just return scores
@@ -103,11 +102,12 @@ class TwoLayerNet(object):
         ############################################################################
         # 需要注意的一点是这里的dx指的是上一层计算出来的score，也就是反向向前传播时上一层的dout
         loss, dscore2 = softmax_loss(scores, y)
-        loss += 0.5 * self.reg * (np.sum(self.params['W1']*self.params['W1']) + np.sum(self.params['W2']*self.params['W2']))
+        loss += 0.5 * self.reg * (
+            np.sum(self.params['W1'] * self.params['W1']) + np.sum(self.params['W2'] * self.params['W2']))
         dscore1, grads['W2'], grads['b2'] = affine_backward(dscore2, cache2)
         _, grads['W1'], grads['b1'] = affine_relu_backward(dscore1, cache1)
-        grads['W2'] += self.reg*self.params['W2']
-        grads['W1'] += self.reg*self.params['W1']
+        grads['W2'] += self.reg * self.params['W2']
+        grads['W1'] += self.reg * self.params['W1']
 
         pass
 
@@ -130,7 +130,7 @@ class FullyConnectedNet(object):
     self.params dictionary and will be learned using the Solver class.
     """
 
-    def __init__(self, hidden_dims, input_dim=3*32*32, num_classes=10,
+    def __init__(self, hidden_dims, input_dim=3 * 32 * 32, num_classes=10,
                  dropout=0, use_batchnorm=False, reg=0.0,
                  weight_scale=1e-2, dtype=np.float32, seed=None):
         """
@@ -173,17 +173,31 @@ class FullyConnectedNet(object):
         # parameters should be initialized to zero.                                #
         ############################################################################
         # 初始化第1层参数
-        self.params['W1'] = weight_scale * np.random.randn(input_dim,hidden_dims[0])
-        self.params['b1'] = np.zeros((1,hidden_dims[0]))
+        self.params['W1'] = weight_scale * np.random.randn(input_dim, hidden_dims[0])
+        self.params['b1'] = np.zeros((1, hidden_dims[0]))
+
+        # Batch Norm参数
+        if self.use_batchnorm:
+            self.params['gamma1'] = np.ones((1, hidden_dims[0]))
+            self.params['beta1'] = np.zeros((1, hidden_dims[0]))
+
         # 初始化2~倒数第2层参数
         for i in range(len(hidden_dims) - 1):
-            currentWeightName = 'W' + str(i+2)
-            currentBiasName = 'b' + str(i+2)
-            self.params[currentWeightName] = weight_scale * np.random.randn(hidden_dims[i],hidden_dims[i+1])
-            self.params[currentBiasName] = np.zeros((1,hidden_dims[i+1]))
+            currentWeightName = 'W' + str(i + 2)
+            currentBiasName = 'b' + str(i + 2)
+            self.params[currentWeightName] = weight_scale * np.random.randn(hidden_dims[i], hidden_dims[i + 1])
+            self.params[currentBiasName] = np.zeros((1, hidden_dims[i + 1]))
+
+            # Batch Norm参数
+            if self.use_batchnorm:
+                currentGammaName = 'gamma' + str(i + 2)
+                currentBetaName = 'beta' + str(i + 2)
+                self.params[currentGammaName] = np.ones((1, hidden_dims[i + 1]))
+                self.params[currentBetaName] = np.zeros((1, hidden_dims[i + 1]))
+
         # 初始化最后一层参数
-        self.params['W'+str(self.num_layers)] = weight_scale * np.random.randn(hidden_dims[-1], num_classes)
-        self.params['b'+str(self.num_layers)] = np.zeros((1,num_classes))
+        self.params['W' + str(self.num_layers)] = weight_scale * np.random.randn(hidden_dims[-1], num_classes)
+        self.params['b' + str(self.num_layers)] = np.zeros((1, num_classes))
 
         pass
 
@@ -208,7 +222,6 @@ class FullyConnectedNet(object):
         # Cast all parameters to the correct datatype
         for k, v in self.params.items():
             self.params[k] = v.astype(dtype)
-
 
     def loss(self, X, y=None):
         """
@@ -242,10 +255,23 @@ class FullyConnectedNet(object):
         ############################################################################
         input = X
         caches = {}
+
+        # affine_bn_relu层score的计算
         for i in range(self.num_layers - 1):
-            scores, caches['layer'+str(i+1)] = affine_relu_forward(input, self.params['W'+str(i+1)], self.params['b'+str(i+1)])
+            if self.use_batchnorm:
+                scores, caches['layer' + str(i + 1)] = \
+                    affine_bn_relu_forward(input, self.params['W' + str(i + 1)], self.params['b' + str(i + 1)],
+                                           self.params['gamma' + str(i + 1)], self.params['beta' + str(i + 1)],
+                                           self.bn_params[i])
+            else:
+                scores, caches['layer' + str(i + 1)] = affine_relu_forward(input, self.params['W' + str(i + 1)],
+                                                                           self.params['b' + str(i + 1)])
+
             input = scores
-        scores, caches['layer'+str(self.num_layers)] = affine_forward(input, self.params['W'+str(self.num_layers)], self.params['b'+str(self.num_layers)])
+
+        # 全连接层score的计算
+        scores, caches['layer' + str(self.num_layers)] = affine_forward(input, self.params['W' + str(self.num_layers)],
+                                                                        self.params['b' + str(self.num_layers)])
         pass
 
         # If test mode return early
@@ -266,16 +292,58 @@ class FullyConnectedNet(object):
         # automated tests, make sure that your L2 regularization includes a factor #
         # of 0.5 to simplify the expression for the gradient.                      #
         ############################################################################
+        # compute loss
         loss, dscore = softmax_loss(scores, y)
         for i in range(self.num_layers):
-            loss += 0.5*self.reg*np.sum(self.params['W'+str(i+1)]*self.params['W'+str(i+1)])
+            loss += 0.5 * self.reg * np.sum(self.params['W' + str(i + 1)] * self.params['W' + str(i + 1)])
 
-        dx, grads['W'+str(self.num_layers)], grads['b'+str(self.num_layers)] = affine_backward(dscore, caches['layer'+str(self.num_layers)])
+        # compute gradients
+        dx, grads['W' + str(self.num_layers)], grads['b' + str(self.num_layers)] = affine_backward(dscore, caches[
+            'layer' + str(self.num_layers)])
+
+        # 接下来要计算affine_bn_relu的反向传播
         for i in range(self.num_layers - 1):
-            currentLayer = self.num_layers - (i+1)
-            dx, grads['W'+str(currentLayer)], grads['b'+str(currentLayer)] = affine_relu_backward(dx, caches['layer'+str(currentLayer)])
-            grads['W'+str(currentLayer)] += self.reg * self.params['W'+str(currentLayer)]
+            currentLayer = self.num_layers - (i + 1)
+
+            if self.use_batchnorm:
+                dx, grads['W' + str(currentLayer)], grads['b' + str(currentLayer)], grads['gamma' + str(currentLayer)], \
+                grads['beta' + str(currentLayer)] \
+                    = affine_bn_relu_backward(dx, caches['layer' + str(currentLayer)])
+            else:
+                dx, grads['W' + str(currentLayer)], grads['b' + str(currentLayer)] = affine_relu_backward(dx, caches[
+                    'layer' + str(currentLayer)])
+
+            grads['W' + str(currentLayer)] += self.reg * self.params['W' + str(currentLayer)]
 
         pass
 
         return loss, grads
+
+
+def affine_bn_relu_forward(x, w, b, gamma, beta, bn_param):
+    # 全连接层正向传播
+    score, fc_cache = affine_forward(x, w, b)
+
+    # Batch Norm层正向传播
+    score, bn_cache = batchnorm_forward(score, gamma, beta, bn_param)
+
+    # relu层正向传播
+    out, relu_cache = relu_forward(score)
+
+    cache = (fc_cache, bn_cache, relu_cache)
+    return out, cache
+
+
+def affine_bn_relu_backward(dout, cache):
+    fc_cache, bn_cache, relu_cache = cache
+
+    # relu反向传播
+    dbn = relu_backward(dout, relu_cache)
+
+    # batch norm反向传播
+    daffine, dgamma, dbeta = batchnorm_backward(dbn, bn_cache)
+
+    # 全连接层反向传播
+    dx, dw, db = affine_backward(daffine, fc_cache)
+
+    return dx, dw, db, dgamma, dbeta
