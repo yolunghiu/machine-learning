@@ -262,10 +262,11 @@ class FullyConnectedNet(object):
                 scores, caches['layer' + str(i + 1)] = \
                     affine_bn_relu_forward(input, self.params['W' + str(i + 1)], self.params['b' + str(i + 1)],
                                            self.params['gamma' + str(i + 1)], self.params['beta' + str(i + 1)],
-                                           self.bn_params[i])
+                                           self.bn_params[i], self.dropout_param)
             else:
-                scores, caches['layer' + str(i + 1)] = affine_relu_forward(input, self.params['W' + str(i + 1)],
-                                                                           self.params['b' + str(i + 1)])
+                scores, caches['layer' + str(i + 1)] = \
+                    affine_relu_forward(input, self.params['W' + str(i + 1)],
+                                        self.params['b' + str(i + 1)], self.dropout_param)
 
             input = scores
 
@@ -308,10 +309,10 @@ class FullyConnectedNet(object):
             if self.use_batchnorm:
                 dx, grads['W' + str(currentLayer)], grads['b' + str(currentLayer)], grads['gamma' + str(currentLayer)], \
                 grads['beta' + str(currentLayer)] \
-                    = affine_bn_relu_backward(dx, caches['layer' + str(currentLayer)])
+                    = affine_bn_relu_backward(dx, caches['layer' + str(currentLayer)], self.dropout_param)
             else:
-                dx, grads['W' + str(currentLayer)], grads['b' + str(currentLayer)] = affine_relu_backward(dx, caches[
-                    'layer' + str(currentLayer)])
+                dx, grads['W' + str(currentLayer)], grads['b' + str(currentLayer)] \
+                    = affine_relu_backward(dx, caches['layer' + str(currentLayer)], self.dropout_param)
 
             grads['W' + str(currentLayer)] += self.reg * self.params['W' + str(currentLayer)]
 
@@ -320,7 +321,7 @@ class FullyConnectedNet(object):
         return loss, grads
 
 
-def affine_bn_relu_forward(x, w, b, gamma, beta, bn_param):
+def affine_bn_relu_forward(x, w, b, gamma, beta, bn_param, dropout_param):
     # 全连接层正向传播
     score, fc_cache = affine_forward(x, w, b)
 
@@ -330,20 +331,27 @@ def affine_bn_relu_forward(x, w, b, gamma, beta, bn_param):
     # relu层正向传播
     out, relu_cache = relu_forward(score)
 
-    cache = (fc_cache, bn_cache, relu_cache)
+    if len(dropout_param) > 0:
+        out, dropout_cache = dropout_forward(out, dropout_param)
+        cache = (fc_cache, bn_cache, relu_cache, dropout_cache)
+    else:
+        cache = (fc_cache, bn_cache, relu_cache)
+
     return out, cache
 
 
-def affine_bn_relu_backward(dout, cache):
-    fc_cache, bn_cache, relu_cache = cache
+def affine_bn_relu_backward(dout, cache, dropout_param):
 
-    # relu反向传播
-    dbn = relu_backward(dout, relu_cache)
-
-    # batch norm反向传播
-    daffine, dgamma, dbeta = batchnorm_backward(dbn, bn_cache)
-
-    # 全连接层反向传播
-    dx, dw, db = affine_backward(daffine, fc_cache)
+    if len(dropout_param) > 0:
+        fc_cache, bn_cache,relu_cache, dropout_cache = cache
+        drelu = dropout_backward(dout, dropout_cache)
+        dbn = relu_backward(drelu, relu_cache)
+        da = relu_backward(dbn, relu_cache)
+        dx, dw, db = affine_backward(da, fc_cache)
+    else:
+        fc_cache, bn_cache, relu_cache = cache
+        dbn = relu_backward(dout, relu_cache)
+        daffine, dgamma, dbeta = batchnorm_backward(dbn, bn_cache)
+        dx, dw, db = affine_backward(daffine, fc_cache)
 
     return dx, dw, db, dgamma, dbeta
