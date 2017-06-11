@@ -346,8 +346,8 @@ def affine_bn_relu_backward(dout, cache, dropout_param):
         fc_cache, bn_cache,relu_cache, dropout_cache = cache
         drelu = dropout_backward(dout, dropout_cache)
         dbn = relu_backward(drelu, relu_cache)
-        da = relu_backward(dbn, relu_cache)
-        dx, dw, db = affine_backward(da, fc_cache)
+        daffine, dgamma, dbeta = batchnorm_backward(dbn, bn_cache)
+        dx, dw, db = affine_backward(daffine, fc_cache)
     else:
         fc_cache, bn_cache, relu_cache = cache
         dbn = relu_backward(dout, relu_cache)
