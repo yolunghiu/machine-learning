@@ -389,10 +389,37 @@ def conv_forward_naive(x, w, b, conv_param):
     # TODO: Implement the convolutional forward pass.                         #
     # Hint: you can use the function np.pad for padding.                      #
     ###########################################################################
+    stride = conv_param['stride']
+    pad = conv_param['pad']
+    N, C, H, W = x.shape
+    F, C, HH, WW = w.shape
+    Hout = int(1 + (H + 2*pad - HH) / stride)
+    Wout = int(1 + (W + 2*pad - WW) / stride)
+
+    out = np.zeros((N, F, Hout, Wout))
+
+    for i in range(N):
+        # zero padding
+        xi = x[i]
+        xi = np.lib.pad(xi[range(C)], 1, 'constant', constant_values=0)
+        xi = xi[1:-1]
+        # print(xi)
+
+        # 用每个filter对xi进行卷积
+        for j in range(F):
+            # 第j个filter
+            filter = w[j]
+            bias = b[j]
+
+            # out[i,j]: Hout*Wout
+            for hindex in range(Hout):
+                for windex in range(Wout):
+                    out[i,j,hindex,windex] = \
+                        np.sum(
+                            xi[:, hindex*stride:hindex*stride+HH, windex*stride:windex*stride+WW] * filter
+                        ) + bias
     pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
+
     cache = (x, w, b, conv_param)
     return out, cache
 
@@ -409,15 +436,19 @@ def conv_backward_naive(dout, cache):
     - dx: Gradient with respect to x
     - dw: Gradient with respect to w
     - db: Gradient with respect to b
+
+    - dout: (N, F, H', W') where H' and W' are given by
+      H' = 1 + (H + 2 * pad - HH) / stride
+      W' = 1 + (W + 2 * pad - WW) / stride
     """
     dx, dw, db = None, None, None
     ###########################################################################
     # TODO: Implement the convolutional backward pass.                        #
     ###########################################################################
+    db = np.sum(np.sum(np.sum(np.sum(dout, axis=0)), axis=-1), axis=-1)
+
     pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
+
     return dx, dw, db
 
 
