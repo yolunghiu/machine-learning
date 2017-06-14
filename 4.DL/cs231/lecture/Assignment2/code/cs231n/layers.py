@@ -443,9 +443,40 @@ def conv_backward_naive(dout, cache):
     """
     dx, dw, db = None, None, None
     ###########################################################################
-    # TODO: Implement the convolutional backward pass.                        #
+    # TODO: Implement the convolutional backward pass.                   #
     ###########################################################################
-    db = np.sum(np.sum(np.sum(np.sum(dout, axis=0)), axis=-1), axis=-1)
+    x, w, b, conv_param = cache
+    N, F, Hout, Wout = dout.shape
+    F, C, HH, WW = w.shape
+    stride = conv_param['stride']
+
+    db = np.zeros((F,))
+    dw = np.zeros_like(w)   # (F, C, HH, WW)
+    dx = np.zeros_like(x)   # (N, C, H, W)
+
+
+    for f in range(F):   # 求dw[wf,C,HH,WW] (每个filter)
+        # compute db
+        db[f] = np.sum(dout[:,f,:,:])
+
+        for c in range(dw.shape[1]):               # 求dw[wf,wc,HH,WW] (每个channel)
+            for sample in range(N):
+                for hout in range(Hout):
+                    for wout in range(Wout):
+
+                        xi = x[sample]
+                        xi = np.lib.pad(xi[range(C)], 1, 'constant', constant_values=0)
+                        xi = xi[1:-1]
+                        dw[f,c,:,:] += \
+                            xi[c,wout*stride:wout*stride+WW,hout*stride:hout*stride+HH] * dout[sample,f,wout,hout]
+
+                        dxi = dx[sample]
+                        dxi = np.lib.pad(dxi[range(C)], 1, 'constant', constant_values=0)
+                        dxi = dxi[1:-1]
+                        # 下面一定要注意是+=，而不是=，因为每个filter卷积过的区域有重叠
+                        dxi[c,wout*stride:wout*stride+WW,hout*stride:hout*stride+HH] += \
+                            dout[sample,f,wout,hout] * w[f,c,:,:]
+                        dx[sample,c,:,:] = dxi[c,1:-1,1:-1]
 
     pass
 
