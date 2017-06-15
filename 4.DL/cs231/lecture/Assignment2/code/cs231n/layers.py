@@ -502,10 +502,22 @@ def max_pool_forward_naive(x, pool_param):
     ###########################################################################
     # TODO: Implement the max pooling forward pass                            #
     ###########################################################################
+    N, C, H, W = x.shape
+    Hpool = pool_param['pool_height']
+    Wpool = pool_param['pool_width']
+    stride = pool_param['stride']
+
+    Hout = int((H - Hpool) / stride + 1)
+    Wout = int((W - Wpool) / stride + 1)
+    out = np.zeros((N,C,Hout,Wout))
+
+    for n in range(N):
+        for c in range(C):
+            for h in range(Hout):
+                for w in range(Wout):
+                    out[n,c,h,w] = np.max(x[n,c,h*stride:h*stride+Hpool,w*stride:w*stride+Wpool])
+
     pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
     cache = (x, pool_param)
     return out, cache
 
@@ -525,10 +537,28 @@ def max_pool_backward_naive(dout, cache):
     ###########################################################################
     # TODO: Implement the max pooling backward pass                           #
     ###########################################################################
+    x, pool_param = cache
+    N, C, H, W = x.shape
+    N, C, Hout, Wout = dout.shape
+    Hpool = pool_param['pool_height']
+    Wpool = pool_param['pool_width']
+    stride = pool_param['stride']
+
+    dx = np.zeros_like(x)
+    for n in range(N):
+        for c in range(C):
+            xi = x[n,c,:,:]
+            for h in range(Hout):
+                for w in range(Wout):
+                    index = np.argmax(xi[h*stride:h*stride+Hpool,w*stride:w*stride+Wpool])
+                    temp = np.zeros((Hpool,Wpool))
+                    xIndex = int(index / Wpool)
+                    yIndex = index % Wpool
+                    temp[xIndex,yIndex] = 1 * dout[n,c,h,w]
+                    dx[n,c,h*stride:h*stride+Hpool,w*stride:w*stride+Wpool] += temp
+
     pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
+
     return dx
 
 
