@@ -48,10 +48,24 @@ class ThreeLayerConvNet(object):
         # hidden affine layer, and keys 'W3' and 'b3' for the weights and biases   #
         # of the output affine layer.                                              #
         ############################################################################
+        # self.params['b2'] = np.zeros((1, hidden_dim))
+        # self.params['W2'] = weight_scale * np.random.randn(hidden_dim, hidden_dim)
+        # self.params['b3'] = np.zeros((1, num_classes))
+        # self.params['W3'] = weight_scale * np.random.randn(hidden_dim, num_classes)
+
+        C, H, W = input_dim
+
+        # conv layer params
+        self.params['W1'] = weight_scale * np.random.randn(num_filters, C, filter_size, filter_size)
+        self.params['b1'] = np.zeros((1, num_filters))
+        # input经过卷积之后，进行2*2的max pool, 数据量变为原来的25%
+        # 通过下面loss函数的conv_params可以算出，经过卷积之后，Hout=H，Wout=W
+        self.params['W2'] = weight_scale * np.random.randn(int(num_filters*H*W/4), hidden_dim)
+        self.params['b2'] = np.zeros((1, hidden_dim))
+        self.params['W3'] = weight_scale * np.random.randn(hidden_dim, num_classes)
+        self.params['b3'] = np.zeros((1, num_classes))
+
         pass
-        ############################################################################
-        #                             END OF YOUR CODE                             #
-        ############################################################################
 
         for k, v in self.params.items():
             self.params[k] = v.astype(dtype)
@@ -68,7 +82,8 @@ class ThreeLayerConvNet(object):
         W3, b3 = self.params['W3'], self.params['b3']
 
         # pass conv_param to the forward pass for the convolutional layer
-        filter_size = W1.shape[2]
+        filter_size = W1.shape[2]   # HH
+        # 按照这个参数，H = Hout， W = Wout
         conv_param = {'stride': 1, 'pad': (filter_size - 1) // 2}
 
         # pass pool_param to the forward pass for the max-pooling layer
@@ -80,10 +95,12 @@ class ThreeLayerConvNet(object):
         # computing the class scores for X and storing them in the scores          #
         # variable.                                                                #
         ############################################################################
+        # compute the forward pass
+        a1, cache1 = conv_relu_pool_forward(X, W1, b1, conv_param, pool_param)
+        a2, cache2 = affine_relu_forward(a1, W2, b2, dropout_param={})
+        scores, cache3 = affine_forward(a2, W3, b3)
+
         pass
-        ############################################################################
-        #                             END OF YOUR CODE                             #
-        ############################################################################
 
         if y is None:
             return scores
@@ -95,9 +112,22 @@ class ThreeLayerConvNet(object):
         # data loss using softmax, and make sure that grads[k] holds the gradients #
         # for self.params[k]. Don't forget to add L2 regularization!               #
         ############################################################################
+
+        # compute the backward pass
+        data_loss, dscores = softmax_loss(scores, y)
+        da2, dW3, db3 = affine_backward(dscores, cache3)
+        da1, dW2, db2 = affine_relu_backward(da2, cache2, dropout_param={})
+        dX, dW1, db1 = conv_relu_pool_backward(da1, cache1)
+
+        # Add regularization
+        dW1 += self.reg * W1
+        dW2 += self.reg * W2
+        dW3 += self.reg * W3
+        reg_loss = 0.5 * self.reg * sum(np.sum(W * W) for W in [W1, W2, W3])
+
+        loss = data_loss + reg_loss
+        grads = {'W1': dW1, 'b1': db1, 'W2': dW2, 'b2': db2, 'W3': dW3, 'b3': db3}
+
         pass
-        ############################################################################
-        #                             END OF YOUR CODE                             #
-        ############################################################################
 
         return loss, grads

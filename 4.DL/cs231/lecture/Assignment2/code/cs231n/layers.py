@@ -562,6 +562,36 @@ def max_pool_backward_naive(dout, cache):
     return dx
 
 
+def spatial_batchnorm_backward(dout, cache):
+    """
+    Computes the backward pass for spatial batch normalization.
+
+    Inputs:
+    - dout: Upstream derivatives, of shape (N, C, H, W)
+    - cache: Values from the forward pass
+
+    Returns a tuple of:
+    - dx: Gradient with respect to inputs, of shape (N, C, H, W)
+    - dgamma: Gradient with respect to scale parameter, of shape (C,)
+    - dbeta: Gradient with respect to shift parameter, of shape (C,)
+    """
+    dx, dgamma, dbeta = None, None, None
+
+    ###########################################################################
+    # TODO: Implement the backward pass for spatial batch normalization.      #
+    #                                                                         #
+    # HINT: You can implement spatial batch normalization using the vanilla   #
+    # version of batch normalization defined above. Your implementation should#
+    # be very short; ours is less than five lines.                            #
+    ###########################################################################
+    pass
+    ###########################################################################
+    #                             END OF YOUR CODE                            #
+    ###########################################################################
+
+    return dx, dgamma, dbeta
+
+
 def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     """
     Computes the forward pass for spatial batch normalization.
@@ -599,36 +629,6 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     ###########################################################################
 
     return out, cache
-
-
-def spatial_batchnorm_backward(dout, cache):
-    """
-    Computes the backward pass for spatial batch normalization.
-
-    Inputs:
-    - dout: Upstream derivatives, of shape (N, C, H, W)
-    - cache: Values from the forward pass
-
-    Returns a tuple of:
-    - dx: Gradient with respect to inputs, of shape (N, C, H, W)
-    - dgamma: Gradient with respect to scale parameter, of shape (C,)
-    - dbeta: Gradient with respect to shift parameter, of shape (C,)
-    """
-    dx, dgamma, dbeta = None, None, None
-
-    ###########################################################################
-    # TODO: Implement the backward pass for spatial batch normalization.      #
-    #                                                                         #
-    # HINT: You can implement spatial batch normalization using the vanilla   #
-    # version of batch normalization defined above. Your implementation should#
-    # be very short; ours is less than five lines.                            #
-    ###########################################################################
-    pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
-
-    return dx, dgamma, dbeta
 
 
 def svm_loss(x, y):
