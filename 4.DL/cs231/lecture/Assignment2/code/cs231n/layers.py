@@ -575,19 +575,23 @@ def spatial_batchnorm_backward(dout, cache):
     - dgamma: Gradient with respect to scale parameter, of shape (C,)
     - dbeta: Gradient with respect to shift parameter, of shape (C,)
     """
-    dx, dgamma, dbeta = None, None, None
+    N, C, H, W = dout.shape
+    dx = np.zeros((dout.shape))
+    dgamma = np.zeros((C, ))
+    dbeta = np.zeros((C, ))
 
-    ###########################################################################
-    # TODO: Implement the backward pass for spatial batch normalization.      #
-    #                                                                         #
-    # HINT: You can implement spatial batch normalization using the vanilla   #
-    # version of batch normalization defined above. Your implementation should#
-    # be very short; ours is less than five lines.                            #
-    ###########################################################################
+    for c in range(C):
+        ccache = cache[c]
+        dcx, dcgamma, dcbeta = batchnorm_backward(
+            dout=np.reshape(dout[:,c,:,:], (N, H*W)),
+            cache=ccache
+        )
+
+        dx[:,c,:,:] = np.reshape(dcx, dx[:,c,:,:].shape)
+        dgamma[c] = np.sum(dcgamma)
+        dbeta[c] = np.sum(dcbeta)
+
     pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
 
     return dx, dgamma, dbeta
 
@@ -614,19 +618,21 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     - out: Output data, of shape (N, C, H, W)
     - cache: Values needed for the backward pass
     """
-    out, cache = None, None
+    N, C, H, W = x.shape
+    out = np.zeros((x.shape))
+    cache = {}
+    # 把每个filter拉成一个向量来处理
+    for c in range(C):
+        cout,ccache = batchnorm_forward(
+            x=np.reshape(x[:,c,:,:],(N,H*W)),
+            gamma=gamma[c] * np.ones((H*W,)),
+            beta=beta[c] * np.ones((H*W,)),
+            bn_param= bn_param
+        )
 
-    ###########################################################################
-    # TODO: Implement the forward pass for spatial batch normalization.       #
-    #                                                                         #
-    # HINT: You can implement spatial batch normalization using the vanilla   #
-    # version of batch normalization defined above. Your implementation should#
-    # be very short; ours is less than five lines.                            #
-    ###########################################################################
+        out[:,c,:,:] = np.reshape(cout,out[:,c,:,:].shape)
+        cache[c] = ccache
     pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
 
     return out, cache
 
