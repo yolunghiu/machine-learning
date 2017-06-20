@@ -11,3 +11,6 @@
 - [可以参考这篇博客][1590c02c]
 
   [1590c02c]: http://blog.csdn.net/chongtong/article/details/53905625?locationNum=6&fps=1 "博客"
+
+  ## 0200_GetStart
+  > TensorFlow入门的一些demo，写在了jupyter里
