@@ -1,6 +1,2 @@
 .idea
-avi
-*.mp4
-*.avi
-*.webm
-*.srt
+tensorflow-r1.2
