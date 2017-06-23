@@ -6,8 +6,7 @@
 	- [1.MATLAB](#1matlab)
 	- [2.sklearn](#2sklearn)
 	- [3.ML_ng](#3mlng)
-	- [4.DL](#4dl)
-	- [5.ML](#5ml)
+	- [4.Resource](#4resource)
 
 <!-- /TOC -->
 
