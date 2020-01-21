@@ -3,7 +3,7 @@ import pandas as pd
 movies_df = pd.read_csv("IMDB-Movie-Data.csv", index_col="Title")
 flag = False
 
-# notes: 访问DataFrame中的Series直接通过[]访问
+# notes: 访问DataFrame中的Series(列)直接通过[]访问
 # flag = not flag
 if flag:
     movies_df.columns = [col.lower() for col in movies_df]
@@ -39,4 +39,11 @@ flag = not flag
 if flag:
     condition = (movies_df['Director'] == "Ridley Scott")
     print(condition.head())
-    # print(movies_df)
+    print('type: {}'.format(type(condition)))
+    print('shape: {}'.format(condition.shape))
+
+    filtered_movie = movies_df[condition]
+    print(filtered_movie.head())
+
+    filtered_by_director = movies_df[movies_df['Director'].isin(['Christopher Nolan', 'Ridley Scott'])]
+    print(filtered_by_director.head())
